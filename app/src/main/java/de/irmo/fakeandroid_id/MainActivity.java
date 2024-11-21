@@ -88,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         String savedAndroidID = getSavedAndroidID();
         if (savedAndroidID != null) {
             androidIdTextView.setText(savedAndroidID);
+        } else {
+            androidIdTextView.setText("No fake Android ID defined");
         }
 
         skipRandomIdCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -96,6 +98,15 @@ public class MainActivity extends AppCompatActivity {
 
         boolean skipRandomId = getSkipRandomId();
         skipRandomIdCheckBox.setChecked(skipRandomId);
+
+        // Keep the android id field always up to date with the prefs file
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        sharedPreferences.registerOnSharedPreferenceChangeListener((sharedPrefs, key) -> {
+            if (KEY_ANDROID_ID.equals(key)) {
+                String updatedAndroidID = sharedPrefs.getString(KEY_ANDROID_ID, "No fake Android ID defined");
+                androidIdTextView.setText(updatedAndroidID);
+            }
+        });
     }
 
     private String generateRandomAndroidID() {
