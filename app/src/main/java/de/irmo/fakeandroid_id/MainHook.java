@@ -27,7 +27,6 @@ public class MainHook implements IXposedHookLoadPackage {
         // Only modify apps containing "voi" in their package name
 
         XposedBridge.log("Hooking into package: :)))" + lpparam.packageName);
-        XposedBridge.log("Hooking into package: :)))" + lpparam.packageName);
 
         try {
             XposedHelpers.findAndHookMethod("android.provider.Settings$Secure", lpparam.classLoader, "getString",
@@ -48,12 +47,16 @@ public class MainHook implements IXposedHookLoadPackage {
                                 SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                                 boolean skipRandomId = sharedPreferences.getBoolean(KEY_SKIP_RANDOM_ID, false);
                                 if (skipRandomId) {
+                                    XposedBridge.log("Skip is active");
                                     return;
                                 }
                                 String savedAndroidID = sharedPreferences.getString(KEY_ANDROID_ID, null);
+
+                                XposedBridge.log("Return this ID: " + savedAndroidID);
                                 if (savedAndroidID != null) {
                                     param.setResult(savedAndroidID);
                                 }
+
                             }
                         }
                     });

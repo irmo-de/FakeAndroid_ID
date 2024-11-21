@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -107,6 +109,20 @@ public class MainActivity extends AppCompatActivity {
                 androidIdTextView.setText(updatedAndroidID);
             }
         });
+
+        // Update customIdEditText when an item from androidIdSpinner is selected
+        androidIdSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedAndroidID = androidIdList.get(position);
+                customIdEditText.setText(selectedAndroidID);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No action needed when nothing is selected.
+            }
+        });
     }
 
     private String generateRandomAndroidID() {
@@ -152,9 +168,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateAndroidIdList(String newAndroidID) {
         if (androidIdList.size() >= 20) {
-            androidIdList.remove(0);
+            androidIdList.remove(androidIdList.size() - 1);
         }
-        androidIdList.add(newAndroidID);
+        androidIdList.add(0, newAndroidID); // Add new ID at the top of the list
         saveAndroidIdList(androidIdList);
         adapter.notifyDataSetChanged();
     }

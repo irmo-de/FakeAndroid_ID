@@ -37,7 +37,7 @@ dependencies {
 
     // Xposed API sources (optional for better IDE support and code navigation)
     //compileOnly("de.robv.android.xposed:api:82:sources")
-
+    implementation("com.google.android.material:material")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
