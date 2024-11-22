@@ -103,17 +103,6 @@ public class MainActivity extends AppCompatActivity {
             sharedPreferences = null;
         }
 
-        if (sharedPreferences == null) {
-            // Check if the preferences file exists
-            File prefsFile = new File(getApplicationContext().getFilesDir().getParent() + "/shared_prefs/" + PREFS_NAME + ".xml");
-            if (prefsFile.exists() && !prefsFile.canRead()) {
-                // If file exists but is not readable, delete it
-                prefsFile.delete();
-            }
-
-            deleteAllSharedPrefs();
-        }
-
         // Return true if preferences can be accessed, false otherwise
         return sharedPreferences != null;
     }
