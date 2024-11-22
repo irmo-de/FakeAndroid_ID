@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
             ImageView launcherLogo = findViewById(R.id.ic_launcher_logo);
             wiggleLogo(launcherLogo);
             updateAndroidIdList(newAndroidID);
+            saveAndroidID(newAndroidID);
         });
 
         saveButton.setOnClickListener(v -> {
@@ -154,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 saveAndroidID(customId);
                 androidIdTextView.setText(customId);
                 updateAndroidIdList(customId);
+                saveAndroidID(customId);
             }
         });
 
