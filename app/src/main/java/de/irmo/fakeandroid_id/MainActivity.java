@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
@@ -88,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         EditText customIdEditText = findViewById(R.id.custom_id_edittext);
         Spinner androidIdSpinner = findViewById(R.id.android_id_spinner);
         CheckBox skipRandomIdCheckBox = findViewById(R.id.skip_random_id_checkbox);
+
+        customIdEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16)});
 
         androidIdList = getSavedAndroidIdList();
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, androidIdList);
