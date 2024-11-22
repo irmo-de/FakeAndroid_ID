@@ -6,8 +6,6 @@
 
 
 
-
-
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,9 +22,8 @@
         <meta-data
             android:name="xposeddescription"
             android:value="A module to change Android ID for specific apps" />
-        <meta-data
-            android:name="xposedminversion"
-            android:value="93" />
+        <meta-data android:name="xposedminversion" android:value="93" />
+        <meta-data android:name="xposedsharedprefs" android:value="true" />
 
         <activity
             android:name=".MainActivity"

@@ -1,8 +1,8 @@
 package de.irmo.fakeandroid_id;
 
+import de.irmo.fakeandroid_id.BuildConfig;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.provider.Settings;
 
 import java.lang.reflect.Field;
@@ -11,6 +11,7 @@ import java.util.Enumeration;
 
 import dalvik.system.BaseDexClassLoader;
 import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -19,6 +20,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class MainHook implements IXposedHookLoadPackage {
 
     private static final String PREFS_NAME = "FakeAndroidIDPrefs";
+
     private static final String KEY_ANDROID_ID = "android_id";
     private static final String KEY_SKIP_RANDOM_ID = "skip_random_id";
 
@@ -27,6 +29,9 @@ public class MainHook implements IXposedHookLoadPackage {
         // Only modify apps containing "voi" in their package name
 
         XposedBridge.log("Hooking into package: :)))" + lpparam.packageName);
+
+        XSharedPreferences sharedPreferences = new XSharedPreferences(BuildConfig.APPLICATION_ID, PREFS_NAME);
+
 
         try {
             XposedHelpers.findAndHookMethod("android.provider.Settings$Secure", lpparam.classLoader, "getString",
@@ -43,8 +48,10 @@ public class MainHook implements IXposedHookLoadPackage {
                             XposedBridge.log("Original result: " + originalResult);
 
                             if ("android_id".equals(param.args[1])) {
-                                Context context = (Context) param.args[0];
-                                SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+                                sharedPreferences.reload();
+
+
                                 boolean skipRandomId = sharedPreferences.getBoolean(KEY_SKIP_RANDOM_ID, false);
                                 if (skipRandomId) {
                                     XposedBridge.log("Skip is active");

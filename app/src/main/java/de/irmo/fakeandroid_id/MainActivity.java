@@ -1,5 +1,6 @@
 package de.irmo.fakeandroid_id;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -30,12 +32,46 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_ANDROID_ID_LIST = "android_id_list";
     private static final String KEY_SKIP_RANDOM_ID = "skip_random_id";
 
+    private SharedPreferences sharedPreferences;
     private List<String> androidIdList;
     private ArrayAdapter<String> adapter;
+
+
+    private void showErrorAndExit() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Error")
+                .setMessage("The module is not activated in LSPosed. Please activate it and select at least one app where the Android ID should be faked. The app will now close.")
+                .setCancelable(false)
+                .setPositiveButton("OK", (dialog, which) -> finish()) // Close the app when the user clicks "OK"
+                .show();
+    }
+
+    private void wiggleLogo(View view) {
+        ObjectAnimator wiggleAnimator = ObjectAnimator.ofFloat(view, "rotation", 0f, -10f, 10f, -10f, 10f, -10f, 0f);
+        wiggleAnimator.setDuration(500);
+        wiggleAnimator.start();
+    }
+
+    // Check if the LSPosed module is loaded
+    private boolean isLSPosedModuleLoaded() {
+        try {
+            sharedPreferences = getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_WORLD_READABLE);
+        } catch (SecurityException ignored) {
+            // The new XSharedPreferences is not enabled or module's not loading
+            sharedPreferences = null;
+        }
+        return sharedPreferences != null; // Returns true if the module is loaded and preferences can be accessed
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!isLSPosedModuleLoaded()) {
+            showErrorAndExit();
+            return;
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -43,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
 
         Button generateButton = findViewById(R.id.generate_button);
         Button saveButton = findViewById(R.id.save_button);
@@ -59,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
         generateButton.setOnClickListener(v -> {
             String newAndroidID = generateRandomAndroidID();
             androidIdTextView.setText(newAndroidID);
+            ImageView launcherLogo = findViewById(R.id.ic_launcher_logo);
+            wiggleLogo(launcherLogo);
             updateAndroidIdList(newAndroidID);
         });
 
@@ -73,8 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
         customIdEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -83,8 +122,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
         String savedAndroidID = getSavedAndroidID();
@@ -94,15 +132,9 @@ public class MainActivity extends AppCompatActivity {
             androidIdTextView.setText("No fake Android ID defined");
         }
 
-        skipRandomIdCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            saveSkipRandomId(isChecked);
-        });
+        skipRandomIdCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> saveSkipRandomId(isChecked));
+        skipRandomIdCheckBox.setChecked(getSkipRandomId());
 
-        boolean skipRandomId = getSkipRandomId();
-        skipRandomIdCheckBox.setChecked(skipRandomId);
-
-        // Keep the android id field always up to date with the prefs file
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         sharedPreferences.registerOnSharedPreferenceChangeListener((sharedPrefs, key) -> {
             if (KEY_ANDROID_ID.equals(key)) {
                 String updatedAndroidID = sharedPrefs.getString(KEY_ANDROID_ID, "No fake Android ID defined");
@@ -110,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Update customIdEditText when an item from androidIdSpinner is selected
         androidIdSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -119,9 +150,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // No action needed when nothing is selected.
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
@@ -131,19 +160,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveAndroidID(String androidID) {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(KEY_ANDROID_ID, androidID);
-        editor.apply();
+        sharedPreferences.edit().putString(KEY_ANDROID_ID, androidID).apply();
     }
 
     private String getSavedAndroidID() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getString(KEY_ANDROID_ID, null);
     }
 
     private List<String> getSavedAndroidIdList() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String androidIdListString = sharedPreferences.getString(KEY_ANDROID_ID_LIST, "");
         String[] androidIdArray = androidIdListString.split(",");
         List<String> androidIdList = new ArrayList<>();
@@ -156,34 +180,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveAndroidIdList(List<String> androidIdList) {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         StringBuilder androidIdListString = new StringBuilder();
         for (String androidId : androidIdList) {
             androidIdListString.append(androidId).append(",");
         }
-        editor.putString(KEY_ANDROID_ID_LIST, androidIdListString.toString());
-        editor.apply();
+        sharedPreferences.edit().putString(KEY_ANDROID_ID_LIST, androidIdListString.toString()).apply();
     }
 
     private void updateAndroidIdList(String newAndroidID) {
-        if (androidIdList.size() >= 20) {
+        // Check if the ID is already in the list
+        if (androidIdList.contains(newAndroidID)) {
+            // Remove the existing ID
+            androidIdList.remove(newAndroidID);
+        }
+        // Add the new ID to the top
+        androidIdList.add(0, newAndroidID);
+
+        // Ensure the list doesn't exceed 20 entries
+        if (androidIdList.size() > 20) {
             androidIdList.remove(androidIdList.size() - 1);
         }
-        androidIdList.add(0, newAndroidID); // Add new ID at the top of the list
+
+        // Save the updated list and notify the adapter
         saveAndroidIdList(androidIdList);
         adapter.notifyDataSetChanged();
     }
 
     private void saveSkipRandomId(boolean skipRandomId) {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(KEY_SKIP_RANDOM_ID, skipRandomId);
-        editor.apply();
+        sharedPreferences.edit().putBoolean(KEY_SKIP_RANDOM_ID, skipRandomId).apply();
     }
 
     private boolean getSkipRandomId() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean(KEY_SKIP_RANDOM_ID, false);
     }
 
