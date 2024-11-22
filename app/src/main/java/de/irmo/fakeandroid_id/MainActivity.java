@@ -23,6 +23,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,10 +42,19 @@ public class MainActivity extends AppCompatActivity {
     private void showErrorAndExit() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Error")
-                .setMessage("The module is not activated in LSPosed. Please activate it and select at least one app where the Android ID should be faked. The app will now close.")
+                .setMessage("The module is not activated in LSPosed. Please activate it and select at least one app where the Android ID should be faked. The app will now terminate.")
                 .setCancelable(false)
-                .setPositiveButton("OK", (dialog, which) -> finish()) // Close the app when the user clicks "OK"
+                .setPositiveButton("OK", (dialog, which) -> terminateApp()) // Terminate the app when the user clicks "OK"
                 .show();
+    }
+
+    private void terminateApp() {
+        // Finish the current activity
+        finish();
+
+        // Exit the process
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(0); // Ensures the VM exits
     }
 
     private void wiggleLogo(View view) {
@@ -53,15 +63,48 @@ public class MainActivity extends AppCompatActivity {
         wiggleAnimator.start();
     }
 
+    // Helper method to delete directories and their contents
+    private boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            if (children != null) {
+                for (String child : children) {
+                    boolean success = deleteDir(new File(dir, child));
+                    if (!success) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return dir != null && dir.delete();
+    }
+
+    private void deleteAllSharedPrefs() {
+        try {
+            // Path to the shared_prefs directory
+            File sharedPrefsDir = new File(getApplicationContext().getFilesDir().getParent() + "/shared_prefs/");
+
+            // Check if the directory exists and is a directory
+            if (sharedPrefsDir.exists() && sharedPrefsDir.isDirectory()) {
+                // Recursively delete all files in the directory
+                deleteDir(sharedPrefsDir);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     // Check if the LSPosed module is loaded
     private boolean isLSPosedModuleLoaded() {
         try {
+            // Attempt to access the preferences file with world-readable mode
             sharedPreferences = getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_WORLD_READABLE);
         } catch (SecurityException ignored) {
-            // The new XSharedPreferences is not enabled or module's not loading
+            // Handle case where preferences file is not accessible due to security
             sharedPreferences = null;
         }
-        return sharedPreferences != null; // Returns true if the module is loaded and preferences can be accessed
+
+        // Return true if preferences can be accessed, false otherwise
+        return sharedPreferences != null;
     }
 
     @Override
