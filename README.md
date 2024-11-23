@@ -3,9 +3,9 @@
 With the evolution of Android, privacy and user tracking restrictions have tightened significantly. Since **Android 10 (API level 29)**, developers face increased challenges when attempting to track users through unique device identifiers.
 **This plugin aims to make it even harder for them**
 
-<p align="center">
+<div style="text-align: center;">
   <img src="https://github.com/irmo-de/FakeAndroid_ID/blob/master/images/Screenshot_20241123-221844.png" alt="Screenshot" width="50%">
-</p>
+</div>
 ---
 
 ## Understanding Unique Identifiers in Android
