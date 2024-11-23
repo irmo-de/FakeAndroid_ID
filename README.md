@@ -48,33 +48,5 @@ The LSPosed plugin allows you to reset your **Android ID** without the need for 
 ### Key Features
 - **Runtime Reset**: Reset your Android ID directly within the plugin interface.
 - **Factory Reset Alternative**: Avoid the hassle of completely resetting your device to generate a new Android ID.
-- **Developer-Oriented Control**: Enables developers and Android experts to test apps with varying Android IDs in different scenarios.
 
-### Why Use This Plugin?
-1. **Testing and Debugging**: Simulate different Android IDs to test user-specific or device-specific behavior in your app.
-2. **Privacy Management**: Gain control over identifiers shared with apps to enhance personal privacy.
-3. **No Device Wipe**: Save time by avoiding a full factory reset whenever you need a new Android ID.
 
----
-
-## How to Use the LSPosed Plugin
-
-1. **Install LSPosed Framework**  
-   Ensure the LSPosed framework is installed and configured on your device. Refer to the LSPosed documentation for setup instructions.
-
-2. **Install the Plugin**  
-   Download and install the LSPosed plugin APK.
-
-3. **Reset Android ID**  
-   - Open the LSPosed plugin.
-   - Navigate to the Android ID reset feature.
-   - Follow the prompts to generate a new Android ID at runtime.
-
-4. **Test the Changes**  
-   Verify the new Android ID using a debugging tool or your app's log to ensure the reset was successful.
-
----
-
-## Important Notes
-- **No Play Store Apps**: Apps downloaded from the Google Play Store do not have access to restricted identifiers like the IMEI or serial number. This ensures a baseline level of privacy and security.
-- **Designed for Developers and Experts**: While this tool provides advanced capabilities, it is intended for Android developers and pow
