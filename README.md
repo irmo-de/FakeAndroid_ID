@@ -1,5 +1,3 @@
-# This module requires LSposed
-
 # LSPosed Plugin: Manage Your Android ID
 
 With the evolution of Android, privacy and user tracking restrictions have tightened significantly. Since **Android 10 (API level 29)**, developers face increased challenges when attempting to track users through unique device identifiers. This plugin aims to simplify the management of Android IDs while respecting user control and privacy.
