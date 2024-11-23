@@ -18,14 +18,12 @@ To identify users or devices, Android relies primarily on two unique identifiers
 ### Changes Introduced in Android 10+
 Android 10 introduced significant restrictions on access to device identifiers:
 
-1. **Non-Resettable Identifiers**  
+**Non-Resettable Identifiers**  
    Access to identifiers like IMEI, serial numbers, or device MAC addresses (e.g., Wi-Fi or Bluetooth) is no longer available to standard apps. Only the following apps can access these identifiers:
    - Device or profile owner apps.
    - Apps with special carrier permissions.
    - Apps with the `READ_PRIVILEGED_PHONE_STATE` permission
 
-2. **Randomization and Privacy by Design**  
-   Android 10+ ensures that developers cannot access Wi-Fi or Bluetooth MAC addresses through traditional APIs.
 
 None of the `Non-Resettable Identifiers` are available for normal user apps from the PlayStore! As such, there is no need to "fake" these identifiers anymore.
 
